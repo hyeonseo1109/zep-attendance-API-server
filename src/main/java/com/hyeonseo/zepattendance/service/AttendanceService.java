@@ -2,12 +2,14 @@ package com.hyeonseo.zepattendance.service;
 
 import com.hyeonseo.zepattendance.dto.AttendanceRequestDto;
 import com.hyeonseo.zepattendance.entity.Attendance;
+import com.hyeonseo.zepattendance.exception.AlreadyCheckedException;
 import com.hyeonseo.zepattendance.repository.AttendanceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -32,7 +34,7 @@ public class AttendanceService {
         attendanceRepository
                 .findByZepUserIdAndCheckDate(request.getZepUserId(), today)
                 .ifPresent(a -> {
-                    throw new RuntimeException("이미 출석했습니다.");
+                    throw new AlreadyCheckedException();
                 });
 
         Attendance attendance = new Attendance(
@@ -44,5 +46,9 @@ public class AttendanceService {
     }
     public String getRandomMessage() {
         return MESSAGES[random.nextInt(MESSAGES.length)];
+    }
+    public List<Attendance> getTodayAttendance() {
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+        return attendanceRepository.findByCheckDate(today);
     }
 }

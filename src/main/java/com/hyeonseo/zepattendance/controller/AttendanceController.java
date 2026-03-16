@@ -3,11 +3,13 @@ package com.hyeonseo.zepattendance.controller;
 import com.hyeonseo.zepattendance.dto.AttendanceRequestDto;
 import com.hyeonseo.zepattendance.dto.AttendanceResponseDto;
 import com.hyeonseo.zepattendance.entity.Attendance;
+import com.hyeonseo.zepattendance.exception.AlreadyCheckedException;
 import com.hyeonseo.zepattendance.service.AttendanceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Random;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,6 +32,17 @@ public class AttendanceController {
                 attendance.getZepUserId(),
                 message
         );
+    }
+
+    @GetMapping("/today")
+    public List<Attendance> getTodayAttendance() {
+        return attendanceService.getTodayAttendance();
+    }
+
+    @ExceptionHandler(AlreadyCheckedException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleAlreadyChecked(AlreadyCheckedException e) {
+        return e.getMessage();
     }
 
 }

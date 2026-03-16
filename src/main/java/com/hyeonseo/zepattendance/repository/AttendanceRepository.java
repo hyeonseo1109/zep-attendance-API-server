@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
-    Optional<Attendance> findByZepUserIdAndCheckDate(String zepUerId, LocalDate checkDate);
+    Optional<Attendance> findByZepUserIdAndCheckDate(String zepUserId, LocalDate checkDate);
 
     List<Attendance> findByZepUserId(String zepUserId);
 
