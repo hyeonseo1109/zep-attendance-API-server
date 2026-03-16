@@ -1,7 +1,6 @@
 package com.hyeonseo.zepattendance.controller;
 
-import com.hyeonseo.zepattendance.dto.AttendanceRequestDto;
-import com.hyeonseo.zepattendance.dto.AttendanceResponseDto;
+import com.hyeonseo.zepattendance.dto.*;
 import com.hyeonseo.zepattendance.entity.Attendance;
 import com.hyeonseo.zepattendance.exception.AlreadyCheckedException;
 import com.hyeonseo.zepattendance.service.AttendanceService;
@@ -9,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -19,7 +19,7 @@ public class AttendanceController {
     private final AttendanceService attendanceService;
 
     @PostMapping
-    public AttendanceResponseDto checkAttendance(
+    public BaseResponseDto<AttendancePostResponse> checkAttendance(
             @RequestBody AttendanceRequestDto request
     ) {
 
@@ -27,21 +27,38 @@ public class AttendanceController {
 
         String message = attendanceService.getRandomMessage();
 
-        return new AttendanceResponseDto(
-                attendance.getId(),
-                attendance.getZepUserId(),
+        AttendancePostResponse response = new AttendancePostResponse(
+                attendance.getCheckDate().toString(),
                 message
         );
+        return new BaseResponseDto<>(true, response);
     }
 
     @GetMapping("/today")
-    public List<Attendance> getTodayAttendance() {
-        return attendanceService.getTodayAttendance();
+    public BaseResponseDto<TodayTotalAttendanceResponse> getTodayAttendance() {
+        List<Attendance> todayAttendance = attendanceService.getTodayAttendance();
+
+        TodayTotalAttendanceResponse response = new TodayTotalAttendanceResponse(
+                todayAttendance.stream()
+                        .map(a -> a.getZepUserId())
+                        .toList(),
+                todayAttendance.size()
+        );
+        return new BaseResponseDto<>(true, response);
     }
 
     @GetMapping("/user")
-    public List<Attendance> getToTalAttendanceById(@RequestParam String userId) {
-        return attendanceService.getUserAttendance(userId);
+    public BaseResponseDto<AttendanceByUserResponse> getUserAttendance(@RequestParam String userId) {
+        List<Attendance> userAttendance = attendanceService.getUserAttendance(userId);
+
+        List<String> dates = userAttendance.stream()
+                .map(a -> a.getCheckDate().toString())
+                .toList();
+
+        List<String> safeDates = dates.isEmpty() ? List.of() : dates;
+
+        AttendanceByUserResponse response = new AttendanceByUserResponse(safeDates, safeDates.size());
+        return new BaseResponseDto<>(true, response);
     }
 
     @ExceptionHandler(AlreadyCheckedException.class)
