@@ -51,4 +51,8 @@ public class AttendanceService {
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
         return attendanceRepository.findByCheckDate(today);
     }
+    public List<Attendance> getUserAttendance(String zepUserId) {
+        List<Attendance> attendances = attendanceRepository.findByZepUserId(zepUserId);
+        return attendances != null ? attendances : List.of();
+    }
 }

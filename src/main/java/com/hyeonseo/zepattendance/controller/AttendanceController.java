@@ -39,6 +39,11 @@ public class AttendanceController {
         return attendanceService.getTodayAttendance();
     }
 
+    @GetMapping("/user")
+    public List<Attendance> getToTalAttendanceById(@RequestParam String userId) {
+        return attendanceService.getUserAttendance(userId);
+    }
+
     @ExceptionHandler(AlreadyCheckedException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public String handleAlreadyChecked(AlreadyCheckedException e) {
