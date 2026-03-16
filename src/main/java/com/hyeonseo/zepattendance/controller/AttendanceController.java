@@ -63,8 +63,8 @@ public class AttendanceController {
 
     @ExceptionHandler(AlreadyCheckedException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public String handleAlreadyChecked(AlreadyCheckedException e) {
-        return e.getMessage();
+    public BaseResponseDto<String> handleAlreadyChecked(AlreadyCheckedException e) {
+        return new BaseResponseDto<>(false, e.getMessage());
     }
 
 }
